@@ -4,3 +4,4 @@
     <!-- 系统无障碍列表展示的服务说明，避ROM风控必备 -->
     <string name="access_desc">开启后自动识别点击广告跳过按钮，支持自定义规则，不会收集任何隐私数据</string>
 </resources>
+<string name="accessibility_desc">自动识别并跳过各类APP开屏、弹窗广告，加载自定义规则文件生效</string>
