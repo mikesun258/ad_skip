@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 关键命名空间，解决android:前缀无法识别编译报错 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.metaworm.skipad">
 
-    <!-- 前台通知权限 Android13+ 前台保活必需 -->
+    <!-- 全部所需权限 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!-- 前台服务权限，无障碍前台常驻 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <!-- 全部文件访问权限，读取外部规则json -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
-    <!-- 传统读写存储权限 兼容低版本安卓 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
@@ -20,10 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SkipAdPad"
-        <!-- 安卓11+分区存储兼容，读取根目录自定义规则文件夹必加 -->
         android:requestLegacyExternalStorage="true">
 
-        <!-- 主Activity -->
+        <!-- 主启动Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -33,7 +28,7 @@
             </intent-filter>
         </activity>
 
-        <!-- 广告跳过无障碍服务，核心服务注册 -->
+        <!-- 无障碍核心服务 -->
         <service
             android:name=".SkipAdService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -41,7 +36,6 @@
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-            <!-- 绑定服务配置xml -->
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility" />
