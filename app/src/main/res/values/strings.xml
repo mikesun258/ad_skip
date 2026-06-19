@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkipAd</string>
+    <!-- 系统无障碍列表展示的服务说明，避ROM风控必备 -->
+    <string name="access_desc">开启后自动识别点击广告跳过按钮，支持自定义规则，不会收集任何隐私数据</string>
+</resources>

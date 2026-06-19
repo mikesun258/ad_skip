@@ -1,0 +1,6 @@
+[
+  {"package":"com.kylin.read","text":"跳过"},
+  {"package":"com.kylin.read","text":"关闭广告","useDelay":true,"delay":1500},
+  {"package":"com.ss.android.ugc.aweme","text":"跳过","useDelay":true,"delay":1000},
+  {"package":"com.douban.frodo","viewId":"btn_skip_ad"}
+]

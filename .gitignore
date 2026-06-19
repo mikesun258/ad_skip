@@ -1,0 +1,10 @@
+# 安卓编译文件夹
+build/
+app/build/
+.gradle/
+*.apk
+*.log
+# AndroidStudio配置文件
+.idea/
+*.iml
+.DS_Store

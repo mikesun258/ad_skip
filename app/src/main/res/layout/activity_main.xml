@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="space-between">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开启无障碍"
+            android:onClick="goAccess"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="重载外部规则"
+            android:onClick="reloadExternalRule"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:text="清空日志"
+            android:layout_height="wrap_content"
+            android:onClick="clearLog"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="抓控件关键词/粘贴JSON规则"
+        android:layout_marginTop="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="space-between"
+        android:layout_marginTop="8dp">
+        <CheckBox
+            android:id="@+id/checkFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="控件抓取调试"
+            android:onClick="toggleFilter"/>
+        <CheckBox
+            android:id="@+id/ckGlobalDelay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="启用规则延时"
+            android:onClick="toggleGlobalDelay"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:text="加载输入框规则"
+            android:layout_height="wrap_content"
+            android:onClick="doConfig"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/editLog"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
+        android:hint="运行日志"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"/>
+</LinearLayout>
