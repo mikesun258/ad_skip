@@ -5,18 +5,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
-    <!-- 示例文本控件，gravity多参数用 | 分隔，无空格 -->
-    <TextView
-        android:id="@+id/tv_status"
+    <EditText
+        android:id="@+id/editLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="登录输入框"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="规则输入框"
+        app:layout_constraintTop_toBottomOf="@id/editLogin"/>
+
+    <CheckBox
+        android:id="@+id/checkFilter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="广告跳过服务就绪"
-        android:gravity="center|center_horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:text="开启过滤"
+        app:layout_constraintTop_toBottomOf="@id/editText"/>
+
+    <CheckBox
+        android:id="@+id/ckGlobalDelay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="全局延迟"
+        app:layout_constraintTop_toBottomOf="@id/checkFilter"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
