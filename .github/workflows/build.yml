@@ -1,40 +1,44 @@
 name: Build Android APK
-# 触发条件：main分支推送、PR、手动可触发
+# 触发条件：main分支推送、PR、网页手动触发
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: # 支持网页手动运行打包
+  workflow_dispatch: # 网页手动运行打包
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 拉取完整源码
+      # 拉取仓库源码
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # 配置JDK11，适配新版Gradle
+      # 配置JDK11并缓存Gradle依赖
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
-          cache: gradle # 缓存gradle依赖，加速后续打包
+          cache: gradle
 
-      # 赋予gradlew执行权限
+      # 给gradlew脚本执行权限
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 编译Debug测试包
+      # 编译Debug安装包
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      # 把编译好的APK上传到Action制品，可下载
+      # 可选：打印APK目录，校验文件是否生成
+      - name: Check APK file
+        run: ls app/build/outputs/apk/debug/
+
+      # 上传APK到Action制品面板，保留30天
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: SkipAd-Debug-APK
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30 # 打包文件保留30天
+          retention-days: 30
