@@ -31,14 +31,15 @@ jobs:
       - name: Install Android SDK via Ali mirror
         run: |
           export ANDROID_HOME=$HOME/android-sdk
-          mkdir -p $ANDROID_HOME/cmdline-tools/latest ~/.android
-          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+          TARGET_CMDLINE=$ANDROID_HOME/cmdline-tools/latest
+          mkdir -p $TARGET_CMDLINE ~/.android
+          if [ ! -f "$TARGET_CMDLINE/bin/sdkmanager" ]; then
             wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
             unzip commandlinetools-linux-11076708_latest.zip -d tmp-tools
-            mv tmp-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+            mv tmp-tools/cmdline-tools/* $TARGET_CMDLINE/
             rm -rf tmp-tools
           fi
-          SDK_BIN=$(find $ANDROID_HOME -name sdkmanager -exec dirname {} \; | head -n1)
+          SDK_BIN=$TARGET_CMDLINE/bin
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo 'sdk.manager.site=https://dl.aliyuncs.com/android/android/repository/' >> ~/.android/sdkmanager.conf
           yes | $SDK_BIN/sdkmanager --licenses
