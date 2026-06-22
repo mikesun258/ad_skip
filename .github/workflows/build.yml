@@ -38,12 +38,12 @@ jobs:
             mv tmp-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
             rm -rf tmp-tools
           fi
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+          source $GITHUB_ENV
           echo 'sdk.manager.site=https://dl.aliyuncs.com/android/android/repository/' >> ~/.android/sdkmanager.conf
           yes | sdkmanager --licenses
           sdkmanager "platforms;android-29" "build-tools;34.0.0"
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "PATH=$PATH" >> $GITHUB_ENV
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
