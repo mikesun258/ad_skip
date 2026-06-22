@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 完整拉取所有自定义源码，解决方法找不到
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -22,30 +22,24 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # 手动下载SDK命令行工具+阿里云安卓SDK镜像安装组件，避开谷歌源网络问题
       - name: Install Android SDK via Ali mirror
         run: |
           export ANDROID_HOME=$HOME/android-sdk
-          mkdir -p $ANDROID_HOME/cmdline-tools/latest
-          # 下载命令行工具
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest ~/.android
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip commandlinetools-linux-11076708_latest.zip -d $ANDROID_HOME/cmdline-tools/latest
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          # 同意许可证
-          yes | sdkmanager --licenses
-          # 替换阿里云安卓SDK镜像源，国内高速下载平台包+构建工具
           echo 'sdk.manager.site=https://dl.aliyuncs.com/android/android/repository/' >> ~/.android/sdkmanager.conf
-          # 安装需要的平台包和构建工具
+          yes | sdkmanager --licenses
           sdkmanager "platforms;android-29" "build-tools;34.0.0"
-          # 注入环境变量给gradle识别SDK
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "PATH=$PATH" >> $GITHUB_ENV
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build debug APK
         run: |
-          # Maven阿里云镜像，解决Gson依赖下载
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
           ./gradlew assembleDebug
 
