@@ -50,25 +50,9 @@ jobs:
 
       - name: Build debug APK
         run: |
-          # mavenCentral第三方库阿里云镜像
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          # 生成CI专用初始化脚本，同时替换buildscript和allprojects仓库
-          cat > ci-init.gradle << 'EOF'
-          buildscript {
-              repositories {
-                  maven { url 'https://maven.aliyun.com/repository/google' }
-                  mavenCentral()
-              }
-          }
-          allprojects {
-              repositories {
-                  maven { url 'https://maven.aliyun.com/repository/google' }
-                  mavenCentral()
-              }
-          }
-          EOF
-          # Gradle原生初始化脚本环境变量，全生命周期加载，不会传入JVM
-          export GRADLE_INIT_SCRIPT=$PWD/ci-init.gradle
+          # 直接替换项目根build.gradle仓库，buildscript阶段就用阿里安卓源
+          sed -i 's|google()|maven { url "https://maven.aliyun.com/repository/google" }|g' build.gradle
           ./gradlew assembleDebug
 
       - name: Upload APK artifact
