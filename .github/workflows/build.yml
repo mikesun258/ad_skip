@@ -45,7 +45,7 @@ jobs:
           yes | $SDK_BIN/sdkmanager --licenses
           $SDK_BIN/sdkmanager "platforms;android-29" "build-tools;34.0.0"
 
-      - name: 全局Gradle初始化脚本，全阶段仓库替换（最先加载）
+      - name: 全局Gradle初始化脚本，全阶段仓库替换
         run: |
           mkdir -p ~/.gradle
           cat > ~/.gradle/init.gradle << 'EOF'
@@ -69,7 +69,8 @@ jobs:
       - name: Build debug APK
         run: |
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          ./gradlew assembleDebug
+          # --no-daemon 不使用缓存守护进程，每次全新启动Gradle，必加载全局init脚本
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
