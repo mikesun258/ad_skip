@@ -11,9 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 拉取完整源码
+      # 拉取完整源码：新增fetch-depth:0 关闭浅克隆，解决自定义方法/工具类缺失
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 核心改动1：拉取全部提交+全部源码文件
 
       # 配置JDK11，适配新版Gradle
       - name: Set up JDK 11
@@ -23,13 +25,24 @@ jobs:
           distribution: 'temurin'
           cache: gradle # 缓存gradle依赖，加速后续打包
 
+      # 新增：安装Android SDK+android-29平台包，补齐GestureDescription系统类
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 29
+          build-tools: 29.0.0
+          extra-packages: 'platforms;android-29' # 核心改动2：安装系统android.jar
+
       # 赋予gradlew执行权限
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 编译Debug测试包
+      # 编译Debug测试包：新增阿里云maven镜像，解决国外依赖拉取超时
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: |
+          # 核心改动3：替换Maven源为阿里云国内镜像
+          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
+          ./gradlew assembleDebug
 
       # 把编译好的APK上传到Action制品，可下载
       - name: Upload APK artifact
