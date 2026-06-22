@@ -45,9 +45,11 @@ jobs:
           yes | $SDK_BIN/sdkmanager --licenses
           $SDK_BIN/sdkmanager "platforms;android-29" "build-tools;34.0.0"
 
-      - name: 直接替换项目buildscript谷歌仓库地址
+      - name: 直接重写build.gradle仓库，完全规避sed语法问题
         run: |
-          sed -i 's/google()/maven { url "https://dl.google.com/android/maven2" }/' build.gradle
+          # 读取原build.gradle，替换两处仓库，重写文件
+          cat build.gradle | sed 's/google()/maven { url "https://dl.google.com/android/maven2" }/g' > new_build.gradle
+          mv new_build.gradle build.gradle
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
