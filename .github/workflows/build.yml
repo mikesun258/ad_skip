@@ -45,15 +45,10 @@ jobs:
           yes | $SDK_BIN/sdkmanager --licenses
           $SDK_BIN/sdkmanager "platforms;android-29" "build-tools;34.0.0"
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build debug APK
+      - name: 全局Gradle初始化脚本，全阶段仓库替换（最先加载）
         run: |
-          # 第三方maven依赖阿里云加速
-          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          # 生成gradle初始化脚本，buildscript+全项目仓库替换，纯gradle语法无shell符号问题
-          cat > ci-init.gradle << 'EOF'
+          mkdir -p ~/.gradle
+          cat > ~/.gradle/init.gradle << 'EOF'
           buildscript {
               repositories {
                   maven { url = "https://dl.google.com/android/maven2" }
@@ -67,8 +62,13 @@ jobs:
               }
           }
           EOF
-          # Gradle原生初始化脚本环境变量，全局最早加载，classpath阶段生效
-          export GRADLE_INIT_SCRIPT=$PWD/ci-init.gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        run: |
+          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
           ./gradlew assembleDebug
 
       - name: Upload APK artifact
