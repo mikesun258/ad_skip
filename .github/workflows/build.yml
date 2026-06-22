@@ -13,9 +13,8 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 完整拉取源码
+          fetch-depth: 0 # 完整拉取全部源码
 
-      # 改动：JDK升级到17，满足新版sdkmanager依赖
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -28,7 +27,7 @@ jobs:
         with:
           packages: |
             platforms;android-29
-            build-tools;29.0.0
+            build-tools;34.0.0
           accept-android-sdk-licenses: true
 
       - name: Grant execute permission for gradlew
