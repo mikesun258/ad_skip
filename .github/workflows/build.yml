@@ -1,43 +1,40 @@
 name: Build Android APK
-on: push
+# 触发条件：main分支推送、PR、手动可触发
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # 支持网页手动运行打包
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 关键1：完整拉取所有代码，禁用浅克隆，解决自定义方法丢失
-      - name: Checkout code
+      # 拉取完整源码
+      - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
+      # 配置JDK11，适配新版Gradle
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: gradle # 缓存gradle依赖，加速后续打包
 
-      # 关键2：强制安装android-29平台包，补齐GestureDescription依赖的系统jar
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 29
-          build-tools: 29.0.0
-          extra-packages: 'platforms;android-29'
+      # 赋予gradlew执行权限
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      # 关键3：gradle缓存+阿里云Maven镜像，解决Gson下载超时
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: gradle-${{ hashFiles('**/*.gradle') }}
+      # 编译Debug测试包
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
 
-      - name: Build APK
-        run: |
-          # 替换maven源为国内阿里云镜像
-          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          ./gradlew assembleDebug
-
-      - name: Upload Debug APK
+      # 把编译好的APK上传到Action制品，可下载
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: SkipAd-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30 # 打包文件保留30天
