@@ -22,6 +22,11 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: 配置Gradle谷歌仓库环境变量，强制路由可访问maven地址
+        run: |
+          echo "ORG_GRADLE_PROJECT_repo.google=https://dl.google.com/android/maven2" >> $GITHUB_ENV
+          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
+
       - name: Cache Android SDK
         uses: actions/cache@v3
         with:
@@ -49,9 +54,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: |
-          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
