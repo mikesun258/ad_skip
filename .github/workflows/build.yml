@@ -50,8 +50,8 @@ jobs:
 
       - name: Build debug APK
         run: |
+          # 仅第三方maven依赖走阿里镜像，google安卓仓库保留原生
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          sed -i 's|google()|maven { url "https://maven.aliyun.com/repository/android" }|g' build.gradle
           ./gradlew assembleDebug
 
       - name: Upload APK artifact
