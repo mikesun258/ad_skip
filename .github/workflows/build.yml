@@ -45,23 +45,9 @@ jobs:
           yes | $SDK_BIN/sdkmanager --licenses
           $SDK_BIN/sdkmanager "platforms;android-29" "build-tools;34.0.0"
 
-      - name: 全局Gradle初始化脚本，全阶段仓库替换
+      - name: 直接替换项目buildscript谷歌仓库地址
         run: |
-          mkdir -p ~/.gradle
-          cat > ~/.gradle/init.gradle << 'EOF'
-          buildscript {
-              repositories {
-                  maven { url = "https://dl.google.com/android/maven2" }
-                  mavenCentral()
-              }
-          }
-          allprojects {
-              repositories {
-                  maven { url = "https://dl.google.com/android/maven2" }
-                  mavenCentral()
-              }
-          }
-          EOF
+          sed -i 's/google()/maven { url "https://dl.google.com/android/maven2" }/' build.gradle
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -69,7 +55,6 @@ jobs:
       - name: Build debug APK
         run: |
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          # --no-daemon 不使用缓存守护进程，每次全新启动Gradle，必加载全局init脚本
           ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
