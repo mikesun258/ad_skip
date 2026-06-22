@@ -22,15 +22,15 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # 手动下载AGP 7.2.3全部文件到本地
-      - name: 离线下载AGP包
+      # 阿里云谷歌镜像下载AGP，地址稳定无404
+      - name: 离线下载AGP7.2.3 阿里云镜像源
         run: |
           mkdir -p ~/agp/com/android/tools/build/gradle/7.2.3
           cd ~/agp/com/android/tools/build/gradle/7.2.3
-          wget https://dl.google.com/android/maven2/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.pom
-          wget https://dl.google.com/android/maven2/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.jar
+          wget https://maven.aliyun.com/repository/google/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.pom
+          wget https://maven.aliyun.com/repository/google/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.jar
 
-      # 全局init脚本：使用本地文件依赖，无任何仓库网络查找
+      # 全局init脚本：本地files依赖，完全不走maven仓库搜索
       - name: 离线模式全局初始化脚本
         run: |
           mkdir -p ~/.gradle
@@ -38,7 +38,7 @@ jobs:
           def agpDir = new File(System.getenv("HOME") + "/agp")
           buildscript {
               repositories {
-                  maven { url = "https://dl.google.com/android/maven2" }
+                  maven { url = "https://maven.aliyun.com/repository/google" }
                   mavenCentral()
               }
               dependencies {
@@ -47,7 +47,7 @@ jobs:
           }
           allprojects {
               repositories {
-                  maven { url = "https://dl.google.com/android/maven2" }
+                  maven { url = "https://maven.aliyun.com/repository/google" }
                   mavenCentral()
               }
           }
