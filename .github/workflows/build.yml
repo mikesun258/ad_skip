@@ -1,51 +1,44 @@
 name: Build Android APK
-# 触发条件：main分支推送、PR、手动可触发
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: # 支持网页手动运行打包
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 拉取完整源码，关闭浅克隆解决自定义代码丢失
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # 完整拉取源码
 
-      # 配置JDK11，gradle缓存
-      - name: Set up JDK 11
+      # 改动：JDK升级到17，满足新版sdkmanager依赖
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
-      # v3正确写法：用packages参数指定需要安装的SDK组件
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # 必须用packages数组格式，安装29平台+29.0.0构建工具
           packages: |
             platforms;android-29
             build-tools;29.0.0
-          accept-android-sdk-licenses: true # 自动同意SDK许可证
+          accept-android-sdk-licenses: true
 
-      # 赋予gradlew执行权限
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 编译+阿里云maven镜像加速依赖下载
       - name: Build debug APK
         run: |
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
           ./gradlew assembleDebug
 
-      # 上传APK制品
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
