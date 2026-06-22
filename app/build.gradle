@@ -1,8 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
+    // 新增namespace，和manifest包名完全一致
+    namespace "com.metaworm.skipad"
     compileSdkVersion 29
-    buildToolsVersion "29.0.0"
+    // 删掉旧版buildToolsVersion "29.0.0"
+
     defaultConfig {
         applicationId "com.metaworm.skipad"
         minSdkVersion 22
