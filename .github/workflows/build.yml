@@ -50,6 +50,7 @@ jobs:
 
       - name: Build debug APK
         run: |
+          # 仅替换mavenCentral第三方库镜像，google安卓仓库保持原生地址，可正常下载AGP
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
           ./gradlew assembleDebug
 
