@@ -10,13 +10,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 完整拉取全部源码，解决自定义工具类/方法缺失
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 配置JDK17+Gradle依赖缓存
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -24,19 +22,16 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # Android SDK全局缓存，key绑定SDK版本，SDK文件不会重复下载
       - name: Cache Android SDK
         uses: actions/cache@v3
         with:
           path: ~/android-sdk
           key: android-sdk-platform29-buildtools34-v1
 
-      # 阿里云镜像安装SDK，修复目录嵌套问题
       - name: Install Android SDK via Ali mirror
         run: |
           export ANDROID_HOME=$HOME/android-sdk
-          mkdir -p $ANDROID_HOME ~/.android
-          # 仅缓存不存在时才下载解压SDK工具
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest ~/.android
           if [ ! -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
             wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
             unzip commandlinetools-linux-11076708_latest.zip -d tmp-tools
@@ -46,7 +41,6 @@ jobs:
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           echo 'sdk.manager.site=https://dl.aliyuncs.com/android/android/repository/' >> ~/.android/sdkmanager.conf
           yes | sdkmanager --licenses
-          # 仅缺少包时安装，缓存命中会直接跳过
           sdkmanager "platforms;android-29" "build-tools;34.0.0"
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "PATH=$PATH" >> $GITHUB_ENV
@@ -54,13 +48,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Maven阿里云镜像加速编译
       - name: Build debug APK
         run: |
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
           ./gradlew assembleDebug
 
-      # 上传编译产物APK
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
