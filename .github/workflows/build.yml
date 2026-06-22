@@ -22,18 +22,20 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # Gradle全局初始化脚本，比项目buildscript更早执行，强制仓库地址
-      - name: 生成全局Gradle初始化脚本
+      # 直接重写根build.gradle的两处repositories，固定谷歌官方maven地址
+      - name: 强制替换项目仓库地址
         run: |
-          mkdir -p ~/.gradle
-          cat > ~/.gradle/init.gradle << 'EOF'
-          allprojects {
-              buildscript {
-                  repositories {
-                      maven { url = "https://dl.google.com/android/maven2" }
-                      mavenCentral()
-                  }
+          cat > build.gradle << 'EOF'
+          buildscript {
+              repositories {
+                  maven { url = "https://dl.google.com/android/maven2" }
+                  mavenCentral()
               }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:7.2.3'
+              }
+          }
+          allprojects {
               repositories {
                   maven { url = "https://dl.google.com/android/maven2" }
                   mavenCentral()
