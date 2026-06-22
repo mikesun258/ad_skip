@@ -50,24 +50,11 @@ jobs:
 
       - name: Build debug APK
         run: |
-          # mavenCentral阿里云加速
+          # 第三方maven库阿里云加速
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          # 生成初始化脚本：google仓库替换为github镜像，国内Actions稳连
-          cat > init.gradle << 'EOF'
-          buildscript {
-              repositories {
-                  maven { url "https://maven.aliyun.com/repository/google" }
-                  maven { url "https://repo.maven.apache.org/maven2" }
-              }
-          }
-          allprojects {
-              repositories {
-                  maven { url "https://maven.aliyun.com/repository/google" }
-                  maven { url "https://repo.maven.apache.org/maven2" }
-              }
-          }
-          EOF
-          ./gradlew assembleDebug -I init.gradle
+          # 直接替换根build.gradle所有google()，换成可用镜像，buildscript阶段直接生效
+          sed -i 's|google()|maven { url "https://repo.maven.apache.org/maven2" }|g' build.gradle
+          ./gradlew assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
