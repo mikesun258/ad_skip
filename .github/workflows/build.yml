@@ -50,9 +50,25 @@ jobs:
 
       - name: Build debug APK
         run: |
-          sed -e 's/repositories { google()/repositories { maven { url "https://dl.google.com/android/maven2" }/' build.gradle
-          sed -e 's/allprojects { repositories { google()/allprojects { repositories { maven { url "https://dl.google.com/android/maven2" }/' build.gradle
+          # 第三方maven依赖阿里云加速
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
+          # 生成gradle初始化脚本，buildscript+全项目仓库替换，纯gradle语法无shell符号问题
+          cat > ci-init.gradle << 'EOF'
+          buildscript {
+              repositories {
+                  maven { url = "https://dl.google.com/android/maven2" }
+                  mavenCentral()
+              }
+          }
+          allprojects {
+              repositories {
+                  maven { url = "https://dl.google.com/android/maven2" }
+                  mavenCentral()
+              }
+          }
+          EOF
+          # Gradle原生初始化脚本环境变量，全局最早加载，classpath阶段生效
+          export GRADLE_INIT_SCRIPT=$PWD/ci-init.gradle
           ./gradlew assembleDebug
 
       - name: Upload APK artifact
