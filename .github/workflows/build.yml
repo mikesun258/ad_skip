@@ -22,10 +22,24 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: 配置Gradle谷歌仓库环境变量，强制路由可访问maven地址
+      # Gradle全局初始化脚本，比项目buildscript更早执行，强制仓库地址
+      - name: 生成全局Gradle初始化脚本
         run: |
-          echo "ORG_GRADLE_PROJECT_repo.google=https://dl.google.com/android/maven2" >> $GITHUB_ENV
-          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
+          mkdir -p ~/.gradle
+          cat > ~/.gradle/init.gradle << 'EOF'
+          allprojects {
+              buildscript {
+                  repositories {
+                      maven { url = "https://dl.google.com/android/maven2" }
+                      mavenCentral()
+                  }
+              }
+              repositories {
+                  maven { url = "https://dl.google.com/android/maven2" }
+                  mavenCentral()
+              }
+          }
+          EOF
 
       - name: Cache Android SDK
         uses: actions/cache@v3
@@ -54,7 +68,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
