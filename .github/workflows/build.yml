@@ -50,10 +50,7 @@ jobs:
 
       - name: Build debug APK
         run: |
-          # mavenCentral阿里云加速
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          # 用gradle内置属性强制google仓库地址，绕过网络解析，全程不需要修改build.gradle文件
-          echo "systemProp.repo.google=https://dl.google.com/android/maven2" >> gradle.properties
           ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
