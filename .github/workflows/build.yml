@@ -50,9 +50,19 @@ jobs:
 
       - name: Build debug APK
         run: |
-          # 仅替换mavenCentral第三方库镜像，google安卓仓库保持原生地址，可正常下载AGP
+          # mavenCentral第三方库阿里云镜像
           echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          ./gradlew assembleDebug
+          # 生成初始化脚本，CI环境替换google仓库为阿里安卓镜像，本地AS不受任何影响
+          cat > init.gradle << 'EOF'
+          allprojects {
+              repositories {
+                  maven { url 'https://maven.aliyun.com/repository/google' }
+                  mavenCentral()
+              }
+          }
+          EOF
+          # -I 加载初始化脚本执行构建
+          ./gradlew assembleDebug -I init.gradle
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
