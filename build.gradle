@@ -1,12 +1,11 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        // AGP升级到7.4.3 支持JDK17
-        classpath 'com.android.tools.build:gradle:7.4.3'
+        // 改成7.2.3，适配gradle7.5
+        classpath 'com.android.tools.build:gradle:7.2.3'
     }
 }
 
