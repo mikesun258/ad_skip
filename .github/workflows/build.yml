@@ -22,17 +22,19 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # 直接重写根build.gradle的两处repositories，固定谷歌官方maven地址
-      - name: 强制替换项目仓库地址
+      # 全局初始化脚本：强制classpath依赖直接走谷歌maven完整地址
+      - name: 全局Gradle初始化脚本锁定AGP下载源
         run: |
-          cat > build.gradle << 'EOF'
+          mkdir -p ~/.gradle
+          cat > ~/.gradle/init.gradle << 'EOF'
+          def agpUrl = "https://dl.google.com/android/maven2/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.pom"
           buildscript {
               repositories {
                   maven { url = "https://dl.google.com/android/maven2" }
                   mavenCentral()
               }
               dependencies {
-                  classpath 'com.android.tools.build:gradle:7.2.3'
+                  classpath "com.android.tools.build:gradle:7.2.3"
               }
           }
           allprojects {
