@@ -32,14 +32,14 @@ jobs:
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           mkdir -p $ANDROID_HOME/cmdline-tools/latest ~/.android
-          if [ ! -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
+          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
             wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
             unzip commandlinetools-linux-11076708_latest.zip -d tmp-tools
             mv tmp-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
             rm -rf tmp-tools
           fi
+          SDK_BIN=$(find $ANDROID_HOME -name sdkmanager -exec dirname {} \; | head -n1)
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          SDK_BIN=$ANDROID_HOME/cmdline-tools/latest/bin
           echo 'sdk.manager.site=https://dl.aliyuncs.com/android/android/repository/' >> ~/.android/sdkmanager.conf
           yes | $SDK_BIN/sdkmanager --licenses
           $SDK_BIN/sdkmanager "platforms;android-29" "build-tools;34.0.0"
