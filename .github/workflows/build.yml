@@ -22,19 +22,27 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # 全局初始化脚本：强制classpath依赖直接走谷歌maven完整地址
-      - name: 全局Gradle初始化脚本锁定AGP下载源
+      # 手动下载AGP 7.2.3全部文件到本地
+      - name: 离线下载AGP包
+        run: |
+          mkdir -p ~/agp/com/android/tools/build/gradle/7.2.3
+          cd ~/agp/com/android/tools/build/gradle/7.2.3
+          wget https://dl.google.com/android/maven2/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.pom
+          wget https://dl.google.com/android/maven2/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.jar
+
+      # 全局init脚本：使用本地文件依赖，无任何仓库网络查找
+      - name: 离线模式全局初始化脚本
         run: |
           mkdir -p ~/.gradle
           cat > ~/.gradle/init.gradle << 'EOF'
-          def agpUrl = "https://dl.google.com/android/maven2/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.pom"
+          def agpDir = new File(System.getenv("HOME") + "/agp")
           buildscript {
               repositories {
                   maven { url = "https://dl.google.com/android/maven2" }
                   mavenCentral()
               }
               dependencies {
-                  classpath "com.android.tools.build:gradle:7.2.3"
+                  classpath files("${agpDir}/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.jar")
               }
           }
           allprojects {
