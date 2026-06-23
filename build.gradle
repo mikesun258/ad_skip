@@ -1,11 +1,11 @@
 buildscript {
     repositories {
-        // 阿里云Android谷歌镜像，结构和dl.google.com/maven2完全一致
         maven { url "https://maven.aliyun.com/repository/google" }
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.3'
+        // 改用阿里云有缓存的7.2.2版本
+        classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 allprojects {
