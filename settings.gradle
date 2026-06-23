@@ -1,2 +1,22 @@
 include ':app'
 rootProject.name='SkipAd'
+
+// 下面新增镜像仓库代码，放在原有内容下方即可
+pluginManagement {
+    repositories {
+        // 国内镜像放最前面，优先走国内加速
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+        google()
+        mavenCentral()
+    }
+}
