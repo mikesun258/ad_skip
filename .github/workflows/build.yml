@@ -4,16 +4,16 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up job
+        run: echo "start build"
+
       - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -22,71 +22,33 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # 阿里云谷歌镜像下载AGP，地址稳定无404
-      - name: 离线下载AGP7.2.3 阿里云镜像源
-        run: |
-          mkdir -p ~/agp/com/android/tools/build/gradle/7.2.3
-          cd ~/agp/com/android/tools/build/gradle/7.2.3
-          wget https://maven.aliyun.com/repository/google/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.pom
-          wget https://maven.aliyun.com/repository/google/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.jar
-
-      # 全局init脚本：本地files依赖，完全不走maven仓库搜索
+      # 删掉了404报错的「离线下载AGP阿里云镜像源」步骤
       - name: 离线模式全局初始化脚本
         run: |
-          mkdir -p ~/.gradle
-          cat > ~/.gradle/init.gradle << 'EOF'
-          def agpDir = new File(System.getenv("HOME") + "/agp")
-          buildscript {
-              repositories {
-                  maven { url = "https://maven.aliyun.com/repository/google" }
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath files("${agpDir}/com/android/tools/build/gradle/7.2.3/gradle-7.2.3.jar")
-              }
-          }
-          allprojects {
-              repositories {
-                  maven { url = "https://maven.aliyun.com/repository/google" }
-                  mavenCentral()
-              }
-          }
-          EOF
+          echo "allprojects{repositories{
+            maven { url 'https://maven.aliyun.com/repository/google' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            google()
+            mavenCentral()
+          }}" > ~/.gradle/init.gradle
 
       - name: Cache Android SDK
         uses: actions/cache@v3
         with:
-          path: ~/android-sdk
-          key: android-sdk-platform29-buildtools34-v1
+          path: ~/Android/Sdk
+          key: ${{ runner.os }}-sdk-${{ hashFiles('**/build.gradle') }}
 
       - name: Install Android SDK via Ali mirror
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          TARGET_CMDLINE=$ANDROID_HOME/cmdline-tools/latest
-          mkdir -p $TARGET_CMDLINE ~/.android
-          if [ ! -f "$TARGET_CMDLINE/bin/sdkmanager" ]; then
-            wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-            unzip commandlinetools-linux-11076708_latest.zip -d tmp-tools
-            mv tmp-tools/cmdline-tools/* $TARGET_CMDLINE/
-            rm -rf tmp-tools
-          fi
-          SDK_BIN=$TARGET_CMDLINE/bin
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo 'sdk.manager.site=https://dl.aliyuncs.com/android/android/repository/' >> ~/.android/sdkmanager.conf
-          yes | $SDK_BIN/sdkmanager --licenses
-          $SDK_BIN/sdkmanager "platforms;android-29" "build-tools;34.0.0"
+        uses: android-actions/setup-android@v3
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: |
-          echo "systemProp.maven.repo.central=https://maven.aliyun.com/repository/central" >> gradle.properties
-          ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SkipAd-Debug-APK
+          name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
