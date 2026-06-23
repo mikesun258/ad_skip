@@ -37,13 +37,10 @@ jobs:
       - name: Install Android SDK via Ali mirror
         uses: android-actions/setup-android@v3
 
-      # 修复sed路径：精准匹配三个关键gradle文件，删除无效gradle/**/*.gradle通配符
       - name: Replace maven repo to aliyun mirror
         run: |
           sed -i 's|google()|maven { url "https://maven.aliyun.com/repository/google" }|g' build.gradle settings.gradle app/build.gradle
           sed -i 's|mavenCentral()|maven { url "https://maven.aliyun.com/repository/public" }|g' build.gradle settings.gradle app/build.gradle
-          # 额外替换gradle下载源为腾讯镜像，加速wrapper下载
-          sed -i 's|services.gradle.org|mirrors.cloud.tencent.com/gradle|g' gradle/wrapper/gradle-wrapper.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
