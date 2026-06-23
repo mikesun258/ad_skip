@@ -1,16 +1,19 @@
 buildscript {
     repositories {
+        // 阿里云加速
         maven { url "https://maven.aliyun.com/repository/google" }
+        // 阿里云网关异常/缺包时自动走官方谷歌仓库兜底
+        google()
         mavenCentral()
     }
     dependencies {
-        // 改用阿里云有缓存的7.2.2版本
         classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 allprojects {
     repositories {
         maven { url "https://maven.aliyun.com/repository/google" }
+        google()
         mavenCentral()
     }
 }
