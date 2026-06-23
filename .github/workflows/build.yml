@@ -9,9 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up job
-        run: echo "start build"
-
       - name: Checkout source code
         uses: actions/checkout@v4
 
@@ -22,21 +19,20 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # 删掉了404报错的「离线下载AGP阿里云镜像源」步骤
-      - name: 离线模式全局初始化脚本
-        run: |
-          echo "allprojects{repositories{
-            maven { url 'https://maven.aliyun.com/repository/google' }
-            maven { url 'https://maven.aliyun.com/repository/public' }
-            google()
-            mavenCentral()
-          }}" > ~/.gradle/init.gradle
+      # 删掉了全局init.gradle脚本，统一用settings.gradle配置仓库，无冲突
+      - name: Cache Gradle依赖
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
 
       - name: Cache Android SDK
         uses: actions/cache@v3
         with:
           path: ~/Android/Sdk
-          key: ${{ runner.os }}-sdk-${{ hashFiles('**/build.gradle') }}
+          key: ${{ runner.os }}-android-sdk-34 # 替换成你的compileSdk版本
 
       - name: Install Android SDK via Ali mirror
         uses: android-actions/setup-android@v3
@@ -44,8 +40,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # 加--info打印详细编译日志，方便排错
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --info
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
