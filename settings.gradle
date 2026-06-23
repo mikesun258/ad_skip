@@ -1,10 +1,6 @@
-include ':app'
-rootProject.name='SkipAd'
-
-// 下面新增镜像仓库代码，放在原有内容下方即可
+// 第一部分必须是pluginManagement，放在文件最顶部
 pluginManagement {
     repositories {
-        // 国内镜像放最前面，优先走国内加速
         maven { url "https://maven.aliyun.com/repository/google" }
         maven { url "https://maven.aliyun.com/repository/public" }
         google()
@@ -20,3 +16,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+// 项目模块&名称配置，必须放在pluginManagement之后
+include ':app'
+rootProject.name='SkipAd'
