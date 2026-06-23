@@ -37,6 +37,12 @@ jobs:
       - name: Install Android SDK via Ali mirror
         uses: android-actions/setup-android@v3
 
+      # 核心改造1：全局替换gradle仓库为阿里云镜像，解决海外拉取超时/404
+      - name: Replace maven repo to aliyun mirror
+        run: |
+          sed -i 's|google()|maven { url "https://maven.aliyun.com/repository/google" }|g' *.gradle gradle/**/*.gradle app/build.gradle
+          sed -i 's|mavenCentral()|maven { url "https://maven.aliyun.com/repository/public" }|g' *.gradle gradle/**/*.gradle app/build.gradle
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
